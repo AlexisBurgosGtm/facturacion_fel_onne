@@ -1,0 +1,94 @@
+const execute = require('./connection');
+const express = require('express');
+const router = express.Router();
+
+router.post("/listado", async(req,res)=>{
+
+    const{empnit,codven} = req.body;
+
+    let qry = `
+       SELECT DOCUMENTOS.DOC_NIT AS NIT, 
+                    DOCUMENTOS.DOC_NOMCLIE AS NOMCLIE, 
+                    ISNULL(CLIENTES.DIRCLIENTE,'CIUDAD') AS DIRCLIE, 
+                    DOCUMENTOS.FECHA, 
+                    DOCUMENTOS.CODDOC, DOCUMENTOS.CORRELATIVO, 
+                    DOCUMENTOS.TOTALPRECIO AS IMPORTE, 
+                    ISNULL(DOCUMENTOS.TOTALPRECIO, 0) - ISNULL(DOCUMENTOS.DOC_ABONO, 0) AS SALDO, 
+                    DOCUMENTOS.DOC_ABONO AS ABONOS, 
+                    DOCUMENTOS.CODCLIENTE, 
+                    DOCUMENTOS.VENCIMIENTO AS VENCE
+        FROM     DOCUMENTOS LEFT OUTER JOIN
+                  CLIENTES ON DOCUMENTOS.EMPNIT = CLIENTES.EMPNIT AND DOCUMENTOS.CODCLIENTE = CLIENTES.CODCLIENTE LEFT OUTER JOIN
+                  TIPODOCUMENTOS ON DOCUMENTOS.EMPNIT = TIPODOCUMENTOS.EMPNIT AND DOCUMENTOS.CODDOC = TIPODOCUMENTOS.CODDOC
+        WHERE  (TIPODOCUMENTOS.TIPODOC IN ('FAC', 'FEF', 'FES', 'FEC', 'FPC', 'FCP')) 
+            AND (DOCUMENTOS.CONCRE = 'CRE') AND (DOCUMENTOS.DOC_SALDO > 0.01) 
+            AND (DOCUMENTOS.EMPNIT = '${empnit}') AND (DOCUMENTOS.STATUS <> 'A') 
+                  AND (DOCUMENTOS.CODVEN = ${codven})
+        ORDER BY DOCUMENTOS.VENCIMIENTO DESC;
+    `
+    
+    
+     execute.Query(res,qry);
+     
+});
+
+
+router.post("/abonos_factura", async(req,res)=>{
+
+    const{sucursal,coddoc,correlativo} = req.body;
+
+    let qry = `
+       SELECT  
+			DOCUMENTOS.FECHA, DOCUMENTOS.HORA, 
+			DOCUMENTOS.CODDOC, DOCUMENTOS.CORRELATIVO, 
+            DOCUMENTOS.CODCLIENTE, 
+			DOCUMENTOS.DOC_NIT, 
+			DOCUMENTOS.DOC_NOMCLIE, 
+			DOCUMENTOS.DOC_DIRCLIE, 
+			DOCUMENTOS.TOTALPRECIO,
+			DOCUMENTOS.CORTE, 
+			DOCUMENTOS.SERIEFAC, 
+			DOCUMENTOS.NOFAC, 
+			DOCUMENTOS.NOCORTE, 
+			DOCUMENTOS.PAGO, 
+            DOCUMENTOS.VUELTO, 
+			DOCUMENTOS.MARCA, 
+			DOCUMENTOS.OBS, 
+			DOCUMENTOS.DOC_SALDO, 
+			DOCUMENTOS.DOC_ABONO, 
+			DOCUMENTOS.OBSMARCA, 
+			DOCUMENTOS.CODCAJA, 
+            DOCUMENTOS.TOTALTARJETA, 
+			DOCUMENTOS.RECARGOTARJETA, 
+			DOCUMENTOS.NOGUIA, 
+			DOCUMENTOS.LAT, DOCUMENTOS.LONG, 
+			DOCUMENTOS.TIPOPAGO, 
+			ISNULL(DOCUMENTOS.NODOCPAGO,'') AS NODOCPAGO, 
+			DOCUMENTOS.IDENTIFICADOR, 
+			DOCUMENTOS.TIPOVENTA
+        FROM  DOCUMENTOS LEFT OUTER JOIN
+            TIPODOCUMENTOS ON DOCUMENTOS.CODDOC = TIPODOCUMENTOS.CODDOC AND DOCUMENTOS.EMPNIT = TIPODOCUMENTOS.EMPNIT
+        WHERE  (DOCUMENTOS.EMPNIT='${sucursal}') 
+            AND (DOCUMENTOS.STATUS<>'A') 
+            AND (DOCUMENTOS.SERIEFAC = '${coddoc}') 
+            AND (DOCUMENTOS.NOFAC = ${correlativo}) 
+            AND (TIPODOCUMENTOS.TIPODOC = 'RCC')
+        ORDER BY DOCUMENTOS.FECHA;
+
+    `
+    
+    console.log(qry);
+    
+     execute.Query(res,qry);
+     
+});
+
+
+
+
+
+
+
+
+module.exports = router;
+
