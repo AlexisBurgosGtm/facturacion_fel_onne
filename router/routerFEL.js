@@ -10,38 +10,17 @@ let FEL = {
     CodigoEstablecimiento:"2", 
     NITEmisor:"2033138K", 
     NombreComercial:"PROVEEDORA FARMACEUTICA RURAL",
-    NombreEmisor:"FRANCISCO RUBÉN, RAMIREZ ESCOBAR", 
+    NombreEmisor:"FRANCISCO RUBEN, RAMIREZ ESCOBAR", 
     Direccion:"MERCADO MUNICIPAL NO 1 TRAMO # 73 Zona: ", 
     CodigoPostal:"10001",
     Municipio:"Morales",
     Departamento:"IZABAL",
-    ACCESO_REQ_NOMBRE:"FRRE_FARMACEUTICAPRO",
+    ACCESO_REQ_NOMBRE: "FRRE_FARMACEUTICAPRO",
     ACCESO_REQ_CLAVE:"7E1F96829DE686788F804D272B92B1C9",
-    ACCESO_FIRMA_USUARIO:"FRRE_FARMACEUTICAPRO",
-    ACCESO_FIRMA_CLAVE:"528d54e924be81ed63c1b2f432feb927",
+    ACCESO_FIRMA_USUARIO: "FRRE_FARMACEUTICAPRO",
+    ACCESO_FIRMA_CLAVE: "528d54e924be81ed63c1b2f432feb927",
     Frases:`<dte:Frase CodigoEscenario="1" TipoFrase="1"></dte:Frase>
-            <dte:Frase CodigoEscenario="1" TipoFrase="2"></dte:Frase>`, 
-    URL_REPORT_INFILE: "https://report.feel.com.gt/ingfacereport/ingfacereport_documento?uuid=",
-    CONFIG_FEL_HABILITADO: 'SI'
-};
-
-
-let FELx = {
-    IVA: 1.12,
-    CodigoEstablecimiento:"3",
-    NITEmisor:"109225961",
-    NombreComercial:"FARMACIA BIENESTAR",
-    NombreEmisor:"TRIDENTE SIN FRONTERAS, SOCIEDAD ANONIMA",
-    Direccion:"AVENIDA PNC ZONA 0",
-    CodigoPostal:"14018",
-    Municipio:"CANILLA",
-    Departamento:"QUICHE",
-    ACCESO_REQ_NOMBRE:"109225961PRO",
-    ACCESO_REQ_CLAVE:"4228A707E8C511FD2BC1BE789AFE9D44",
-    ACCESO_FIRMA_USUARIO:"109225961PRO",
-    ACCESO_FIRMA_CLAVE:"9d56208067b2eb68802f301647dd644a",
-    Frases: `<dte:Frase CodigoEscenario="1" TipoFrase="1"></dte:Frase>
-            `,
+          <dte:Frase CodigoEscenario="1" TipoFrase="2"></dte:Frase>`,
     URL_REPORT_INFILE: "https://report.feel.com.gt/ingfacereport/ingfacereport_documento?uuid=",
     CONFIG_FEL_HABILITADO: 'SI'
 };
@@ -369,6 +348,7 @@ let funciones = {
         },
         solicitar_firma_FEL(nofactura,xml){
             return new Promise((resolve,reject)=>{
+
                 axios.post('https://signer-emisores.feel.com.gt/sign_solicitud_firmas/firma_xml', {
                     llave: FEL.ACCESO_FIRMA_CLAVE, 
                     archivo: xml, 
